@@ -3,6 +3,7 @@
 build/
 schema/
 gradle/
+src/main/java/generated
 
 *.iml
 gradlew
