@@ -10,13 +10,11 @@ repositories {
     jcenter()
 }
 
-task initSchema() {
-    delete 'schema'
-    ant.get(src: 'https://github.com/ETDA/etax-schema/releases/download/v2.0.1/schema-v2.0.1.zip', dest: 'schema.zip', skipexisting: 'true')
-    ant.unzip(src: 'schema.zip', dest: '.')
-    delete 'schema.zip'
-    delete 'src/main/java/generated'
-}
+delete 'schema'
+ant.get(src: 'https://github.com/ETDA/etax-schema/releases/download/v2.0.1/schema-v2.0.1.zip', dest: 'schema.zip', skipexisting: 'true')
+ant.unzip(src: 'schema.zip', dest: '.')
+delete 'schema.zip'
+delete 'src/main/java/generated'
 
 xjcGenerate {
     source = fileTree('schema/XMLSchemaV2/ETDA/data/standard/TaxInvoice_CrossIndustryInvoice_2p0.xsd') {
