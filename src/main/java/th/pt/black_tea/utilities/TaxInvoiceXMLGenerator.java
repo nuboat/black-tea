@@ -3,6 +3,7 @@ package th.pt.black_tea.utilities;
 import etda.uncefact.data.standard.taxinvoice_crossindustryinvoice._2.ObjectFactory;
 import etda.uncefact.data.standard.taxinvoice_crossindustryinvoice._2.TaxInvoiceCrossIndustryInvoiceType;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import sun.security.x509.*;
 
 import javax.xml.bind.JAXBContext;
@@ -10,6 +11,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
 import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -25,10 +27,8 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class TaxInvoiceXMLGenerator {
     private ObjectFactory factory = new ObjectFactory();
@@ -68,16 +68,16 @@ public class TaxInvoiceXMLGenerator {
 
     private OutputStream sign(DOMResult dom) {
         StreamResult result = new StreamResult(System.out);
+        String providerName = System.getProperty("jsr105Provider"
+                , "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        String signatureId = UUID.randomUUID().toString();
 
         try {
-            KeyPair kp = mockKeyPair("RSA", 1024);
-            X509Certificate cert = mockCertificate("CN=www.fuckyou.com", kp, 256, "SHA512withRSA");
-
-            String providerName = System.getProperty("jsr105Provider"
-                    , "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-
             XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"
                     , (Provider) Class.forName(providerName).newInstance());
+            KeyPair kp = mockKeyPair("RSA", 1024);
+            X509Certificate cert = mockCertificate("CN=www.fuckyou.com", kp, 256, "SHA512withRSA");
+            List<XMLObject> properties = mockSignedProperties((Document) dom.getNode(), fac, signatureId);
 
             Reference ref = fac.newReference(""
                     , fac.newDigestMethod("http://www.w3.org/2001/04/xmlenc#sha512", null)
@@ -102,7 +102,7 @@ public class TaxInvoiceXMLGenerator {
             DOMSignContext dsc = new DOMSignContext(kp.getPrivate()
                     , doc.getDocumentElement());
 
-            XMLSignature signature = fac.newXMLSignature(si, ki);
+            XMLSignature signature = fac.newXMLSignature(si, ki, properties, signatureId, null);
             signature.sign(dsc);
 
             TransformerFactory tf = TransformerFactory.newInstance();
@@ -153,6 +153,37 @@ public class TaxInvoiceXMLGenerator {
         cert = new X509CertImpl(info);
         cert.sign(privkey, algorithm);
         return cert;
+    }
+
+    private List<XMLObject> mockSignedProperties(Document dom, XMLSignatureFactory fac, String signatureId) {
+        String signaturePropertyId = UUID.randomUUID().toString();
+
+        // Contenido de SignatureProperty
+        Element content = dom.createElement("dc:date");
+        content.setAttribute("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SS");
+        content.setTextContent(sdf.format(new Date()));
+        XMLStructure str = new DOMStructure(content);
+        List<XMLStructure> contentList = new ArrayList<XMLStructure>();
+        contentList.add(str);
+
+        // SignatureProperty
+        SignatureProperty sp = fac.newSignatureProperty(contentList, "#" + signatureId,
+                signaturePropertyId);
+        List<SignatureProperty> spList = new ArrayList<SignatureProperty>();
+        spList.add(sp);
+
+        // SignatureProperties
+        SignatureProperties sps = fac.newSignatureProperties(spList, null);
+        List<SignatureProperties> spsList = new ArrayList<SignatureProperties>();
+        spsList.add(sps);
+
+        // Object
+        XMLObject object = fac.newXMLObject(spsList, null, null, null);
+        List<XMLObject> objectList = new ArrayList<XMLObject>();
+        objectList.add(object);
+
+        return objectList;
     }
 
 }
