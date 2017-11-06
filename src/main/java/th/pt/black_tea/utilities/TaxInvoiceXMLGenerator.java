@@ -14,7 +14,6 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
-import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
@@ -54,7 +53,7 @@ public class TaxInvoiceXMLGenerator {
 
             DOMResult dom = new DOMResult();
             jaxbMarshaller.marshal(jaxB, dom);
-            signedStream = signed(dom);
+            signedStream = sign(dom);
 
         } catch (JAXBException e) {
             e.printStackTrace();
@@ -62,7 +61,7 @@ public class TaxInvoiceXMLGenerator {
         return signedStream;
     }
 
-    private OutputStream signed(DOMResult dom) {
+    private OutputStream sign(DOMResult dom) {
         StreamResult result = new StreamResult(System.out);
 
 
