@@ -80,13 +80,13 @@ public class TaxInvoiceXMLGenerator {
                     , (Provider) Class.forName(providerName).newInstance());
 
             Reference ref = fac.newReference(""
-                    , fac.newDigestMethod(DigestMethod.SHA1, null)
+                    , fac.newDigestMethod("http://www.w3.org/2001/04/xmlenc#sha512", null)
                     , Collections.singletonList(fac.newTransform(Transform.ENVELOPED, (XMLStructure) null))
                     , null
                     , null);
 
             SignedInfo si = fac.newSignedInfo(
-                    fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (XMLStructure) null)
+                    fac.newCanonicalizationMethod("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", (XMLStructure) null)
                     , fac.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", null)
                     , Collections.singletonList(ref));
 
