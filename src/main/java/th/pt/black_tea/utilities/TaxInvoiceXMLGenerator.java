@@ -14,6 +14,7 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
@@ -80,11 +81,11 @@ public class TaxInvoiceXMLGenerator {
 
             SignedInfo si = fac.newSignedInfo(
                     fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE_WITH_COMMENTS, (XMLStructure) null)
-                    , fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null)
+                    , fac.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", null)
                     , Collections.singletonList(ref));
 
             KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(512);
+            kpg.initialize(1024);
             KeyPair kp = kpg.generateKeyPair();
 
             KeyInfoFactory kif = fac.getKeyInfoFactory();
