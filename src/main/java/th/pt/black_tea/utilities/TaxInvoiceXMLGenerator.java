@@ -3,6 +3,7 @@ package th.pt.black_tea.utilities;
 import etda.uncefact.data.standard.taxinvoice_crossindustryinvoice._2.ObjectFactory;
 import etda.uncefact.data.standard.taxinvoice_crossindustryinvoice._2.TaxInvoiceCrossIndustryInvoiceType;
 import org.w3c.dom.Document;
+import sun.security.x509.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -13,17 +14,21 @@ import javax.xml.crypto.dsig.*;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
-import javax.xml.crypto.dsig.keyinfo.KeyValue;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
 import java.io.OutputStream;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.Provider;
+import java.math.BigInteger;
+import java.security.*;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class TaxInvoiceXMLGenerator {
     private ObjectFactory factory = new ObjectFactory();
@@ -64,8 +69,10 @@ public class TaxInvoiceXMLGenerator {
     private OutputStream sign(DOMResult dom) {
         StreamResult result = new StreamResult(System.out);
 
-
         try {
+            KeyPair kp = mockKeyPair("RSA", 1024);
+            X509Certificate cert = mockCertificate("CN=www.fuckyou.com", kp, 256, "SHA512withRSA");
+
             String providerName = System.getProperty("jsr105Provider"
                     , "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
 
@@ -83,14 +90,12 @@ public class TaxInvoiceXMLGenerator {
                     , fac.newSignatureMethod("http://www.w3.org/2001/04/xmldsig-more#rsa-sha512", null)
                     , Collections.singletonList(ref));
 
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(1024);
-            KeyPair kp = kpg.generateKeyPair();
-
             KeyInfoFactory kif = fac.getKeyInfoFactory();
-            KeyValue kv = kif.newKeyValue(kp.getPublic());
-
-            KeyInfo ki = kif.newKeyInfo(Collections.singletonList(kv));
+            List<Object> x509Content = new ArrayList<Object>();
+            x509Content.add(cert.getSubjectX500Principal().getName());
+            x509Content.add(cert);
+            X509Data cerData = kif.newX509Data(x509Content);
+            KeyInfo ki = kif.newKeyInfo(Collections.singletonList(cerData), null);
 
             Document doc = (Document) dom.getNode();
 
@@ -109,6 +114,45 @@ public class TaxInvoiceXMLGenerator {
         }
 
         return result.getOutputStream();
+    }
+
+    private KeyPair mockKeyPair(String algorithm, int keySize) throws NoSuchAlgorithmException {
+        KeyPairGenerator keyPairGenerator = null;
+        keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        keyPairGenerator.initialize(keySize);
+
+        return keyPairGenerator.generateKeyPair();
+    }
+
+    private X509Certificate mockCertificate(String dn, KeyPair pair, int days, String algorithm)
+            throws GeneralSecurityException, IOException {
+        PrivateKey privkey = pair.getPrivate();
+        X509CertInfo info = new X509CertInfo();
+        Date from = new Date();
+        Date to = new Date(from.getTime() + days * 86400000l);
+        CertificateValidity interval = new CertificateValidity(from, to);
+        BigInteger sn = new BigInteger(64, new SecureRandom());
+        X500Name owner = new X500Name(dn);
+
+        info.set(X509CertInfo.VALIDITY, interval);
+        info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn));
+        info.set(X509CertInfo.SUBJECT, owner);
+        info.set(X509CertInfo.ISSUER, owner);
+        info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic()));
+        info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
+        AlgorithmId algo = new AlgorithmId(AlgorithmId.md5WithRSAEncryption_oid);
+        info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algo));
+
+        // Sign the cert to identify the algorithm that's used.
+        X509CertImpl cert = new X509CertImpl(info);
+        cert.sign(privkey, algorithm);
+
+        // Update the algorith, and resign.
+        algo = (AlgorithmId) cert.get(X509CertImpl.SIG_ALG);
+        info.set(CertificateAlgorithmId.NAME + "." + CertificateAlgorithmId.ALGORITHM, algo);
+        cert = new X509CertImpl(info);
+        cert.sign(privkey, algorithm);
+        return cert;
     }
 
 }
