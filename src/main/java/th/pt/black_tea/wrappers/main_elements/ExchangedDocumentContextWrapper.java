@@ -4,13 +4,13 @@ import etda.uncefact.data.standard.qualifieddatatype._1.Max35IDType;
 import etda.uncefact.data.standard.taxinvoice_reusableaggregatebusinessinformationentity._2.DocumentContextParameterType;
 import etda.uncefact.data.standard.taxinvoice_reusableaggregatebusinessinformationentity._2.ExchangedDocumentContextType;
 
-public class DocumentContextWrapper {
+public class ExchangedDocumentContextWrapper {
 
-    private static DocumentContextWrapper wrapper = null;
+    private static ExchangedDocumentContextWrapper wrapper = null;
 
     private ExchangedDocumentContextType element = new ExchangedDocumentContextType();
 
-    private DocumentContextWrapper() {
+    private ExchangedDocumentContextWrapper() {
         Max35IDType max35IDType = new Max35IDType();
         max35IDType.setValue("ER3-2560");
         max35IDType.setSchemeAgencyID("ETDA");
@@ -22,9 +22,9 @@ public class DocumentContextWrapper {
         element.setGuidelineSpecifiedDocumentContextParameter(docContext);
     }
 
-    public static DocumentContextWrapper getInstance() {
+    public static ExchangedDocumentContextWrapper getInstance() {
         if (wrapper == null)
-            wrapper = new DocumentContextWrapper();
+            wrapper = new ExchangedDocumentContextWrapper();
         return wrapper;
     }
 
