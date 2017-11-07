@@ -11,6 +11,13 @@ public class Max35Wrapper {
         return max35;
     }
 
+    public static Max35IDType id(String id, String schemeId) {
+        Max35IDType max35 = new Max35IDType();
+        max35.setValue(id);
+        max35.setSchemeID(schemeId);
+        return max35;
+    }
+
     public static Max35TextType text(String text) {
         Max35TextType max35 = new Max35TextType();
         max35.setValue(text);
