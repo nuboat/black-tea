@@ -6,13 +6,13 @@ import th.pt.black_tea.utilities.TaxInvoiceXMLGenerator;
 
 import java.io.ByteArrayOutputStream;
 
-public class DocumentContextWrapperSpec {
+public class ExchangedDocumentContextWrapperSpec {
 
     @Test
     public void generateCorrectDocumentContext() {
         TaxInvoiceXMLGenerator generator = TaxInvoiceXMLGenerator.getInstance();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        DocumentContextWrapper docContext = DocumentContextWrapper.getInstance();
+        ExchangedDocumentContextWrapper docContext = ExchangedDocumentContextWrapper.getInstance();
         TaxInvoiceCrossIndustryInvoiceType taxInvoice = new TaxInvoiceCrossIndustryInvoiceType();
         taxInvoice.setExchangedDocumentContext(docContext.getDefault());
 
