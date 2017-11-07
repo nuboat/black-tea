@@ -1,4 +1,4 @@
-package th.pt.black_tea.wrappers;
+package th.pt.black_tea.wrappers.main_elements;
 
 import etda.uncefact.data.standard.taxinvoice_crossindustryinvoice._2.TaxInvoiceCrossIndustryInvoiceType;
 import org.junit.Test;
