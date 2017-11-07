@@ -1,4 +1,4 @@
-package th.pt.black_tea.wrappers;
+package th.pt.black_tea.wrappers.fields;
 
 import etda.uncefact.data.standard.qualifieddatatype._1.Max35IDType;
 import etda.uncefact.data.standard.qualifieddatatype._1.Max35TextType;
