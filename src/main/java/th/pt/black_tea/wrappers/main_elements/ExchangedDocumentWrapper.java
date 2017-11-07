@@ -1,7 +1,8 @@
-package th.pt.black_tea.wrappers;
+package th.pt.black_tea.wrappers.main_elements;
 
 import etda.uncefact.data.standard.qualifieddatatype._1.ThaiInvoiceDocumentCodeType;
 import etda.uncefact.data.standard.taxinvoice_reusableaggregatebusinessinformationentity._2.ExchangedDocumentType;
+import th.pt.black_tea.wrappers.fields.Max35Wrapper;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
