@@ -76,7 +76,7 @@ public class TaxInvoiceXMLGenerator {
             XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM"
                     , (Provider) Class.forName(providerName).newInstance());
             KeyPair kp = mockKeyPair("RSA", 1024);
-            X509Certificate cert = mockCertificate("CN=www.fuckyou.com", kp, 256, "SHA512withRSA");
+            X509Certificate cert = mockCertificate("CN=www.billme.co.th", kp, 256, "SHA512withRSA");
             List<XMLObject> properties = mockSignedProperties((Document) dom.getNode(), fac, signatureId);
 
             Reference ref = fac.newReference(""
