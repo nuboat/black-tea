@@ -10,6 +10,7 @@ import th.pt.black_tea.utilities.TaxInvoiceXMLGenerator;
 import th.pt.black_tea.wrappers.main_elements.ExchangedDocumentContextWrapper;
 import th.pt.black_tea.wrappers.main_elements.ExchangedDocumentWrapper;
 import th.pt.black_tea.wrappers.main_elements.SupplyChainTradeTransactionWrapper;
+import th.pt.black_tea.wrappers.sub_elements.SupplyChainItemWrapper;
 import th.pt.black_tea.wrappers.sub_elements.TradePartyWrapper;
 
 import java.io.ByteArrayOutputStream;
@@ -47,7 +48,10 @@ public class TaxInvoiceXMLGeneratorSpec {
 
         agreement.setSellerTradeParty(seller);
         agreement.setBuyerTradeParty(buyer);
+
+        SupplyChainItemWrapper itemWrapper = SupplyChainItemWrapper.getInstance();
         chain.setApplicableHeaderTradeAgreement(agreement);
+        chain.getIncludedSupplyChainTradeLineItem().add(itemWrapper.getElement("รถคันแรก", 300.00, 1));
 
         taxInvoice.setSupplyChainTradeTransaction(chain);
         taxInvoice.setExchangedDocument(wrapper.getTaxInvoice("TIV-00125", new Date()));
