@@ -15,6 +15,7 @@ import th.pt.black_tea.wrappers.sub_elements.SupplyChainItemWrapper;
 import th.pt.black_tea.wrappers.sub_elements.TradePartyWrapper;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
 public class TaxInvoiceWrapper {
@@ -62,7 +63,13 @@ public class TaxInvoiceWrapper {
         taxInvoice.setExchangedDocumentContext(docContext.getDefault());
 
         generator.generate(taxInvoice, stream);
-        String result = new String(stream.toByteArray());
+
+        String result = null;
+        try {
+            result = new String(stream.toByteArray(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         return result;
     }
