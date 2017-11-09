@@ -24,8 +24,9 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: "com.jfrog.artifactory"
-version = '0.0.2'
+version = '0.0.3'
 group = 'th.pt'
+compileJava.options.encoding = 'UTF-8'
 defaultTasks 'clean', 'test'
 
 repositories {
@@ -68,7 +69,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId 'th.pt'
             artifactId 'black-tea'
-            version '0.0.2'
+            version '0.0.3'
             from components.java
         }
     }
