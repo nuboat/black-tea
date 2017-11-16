@@ -24,7 +24,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: "com.jfrog.artifactory"
-version = '0.0.3'
+version = '0.0.4'
 group = 'th.pt'
 compileJava.options.encoding = 'UTF-8'
 defaultTasks 'clean', 'test'
