@@ -62,14 +62,7 @@ public class TaxInvoiceWrapper {
         taxInvoice.setExchangedDocument(wrapper.getTaxInvoice(form.number, new Date()));
         taxInvoice.setExchangedDocumentContext(docContext.getDefault());
 
-        generator.generate(taxInvoice, stream);
-
-        String result = null;
-        try {
-            result = new String(stream.toByteArray(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        String result = generator.generate(taxInvoice, stream);
 
         return result;
     }

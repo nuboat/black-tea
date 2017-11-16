@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
@@ -45,9 +46,9 @@ public class TaxInvoiceXMLGenerator {
         return generator;
     }
 
-    public OutputStream generate(TaxInvoiceCrossIndustryInvoiceType taxInvoice, OutputStream stream) {
+    public String generate(TaxInvoiceCrossIndustryInvoiceType taxInvoice, OutputStream stream) {
         JAXBElement<TaxInvoiceCrossIndustryInvoiceType> jaxB = factory.createTaxInvoiceCrossIndustryInvoice(taxInvoice);
-        OutputStream signedStream = null;
+        String signedStream = null;
 
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(TaxInvoiceCrossIndustryInvoiceType.class);
@@ -66,8 +67,8 @@ public class TaxInvoiceXMLGenerator {
         return signedStream;
     }
 
-    private OutputStream sign(DOMResult dom) {
-        StreamResult result = new StreamResult(System.out);
+    private String sign(DOMResult dom) {
+        StreamResult result = new StreamResult(new ByteArrayOutputStream());
         String providerName = System.getProperty("jsr105Provider"
                 , "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
         String signatureId = UUID.randomUUID().toString();
@@ -113,7 +114,9 @@ public class TaxInvoiceXMLGenerator {
             e.printStackTrace();
         }
 
-        return result.getOutputStream();
+        ByteArrayOutputStream byteResult = (ByteArrayOutputStream) result.getOutputStream();
+
+        return new String(byteResult.toByteArray());
     }
 
     private KeyPair mockKeyPair(String algorithm, int keySize) throws NoSuchAlgorithmException {

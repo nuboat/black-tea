@@ -57,8 +57,7 @@ public class TaxInvoiceXMLGeneratorSpec {
         taxInvoice.setExchangedDocument(wrapper.getTaxInvoice("TIV-00125", new Date()));
         taxInvoice.setExchangedDocumentContext(docContext.getDefault());
 
-        generator.generate(taxInvoice,stream);
-        String result = new String(stream.toByteArray());
+        String result = generator.generate(taxInvoice,stream);
 
         assert(result.contains("etda"));
     }
