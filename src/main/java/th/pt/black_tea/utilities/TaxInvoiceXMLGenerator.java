@@ -25,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.X509Certificate;
@@ -115,8 +116,14 @@ public class TaxInvoiceXMLGenerator {
         }
 
         ByteArrayOutputStream byteResult = (ByteArrayOutputStream) result.getOutputStream();
+        String endResult = null;
+        try{
+            endResult = new String(byteResult.toByteArray(), "UTF-8");
+        }catch (UnsupportedEncodingException e){
+            e.printStackTrace();
+        }
 
-        return new String(byteResult.toByteArray());
+        return endResult;
     }
 
     private KeyPair mockKeyPair(String algorithm, int keySize) throws NoSuchAlgorithmException {
